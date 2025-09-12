@@ -38,7 +38,7 @@ commits_since_last_tag() {
 
 case $TARGET in
     count) commits_since_last_tag ;;
-    *) die "Invalid target $target" ;;
+    *) echo "Invalid target $target" ; exit 99 ;;
 esac
 
 exit 0

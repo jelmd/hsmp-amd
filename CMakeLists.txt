@@ -3,6 +3,8 @@
 #
 cmake_minimum_required(VERSION 3.5.0)
 
+set(CMAKE_SKIP_BUILD_RPATH true)
+set(CMAKE_SKIP_RPATH true)
 #
 #   cmake command line options:
 #
@@ -22,9 +24,11 @@ set(ENABLE_STATIC_LIB OFF CACHE STRING
     "Whether to build as a Static Library. Set 1 to Enable, default is Disabled.")
 
 set(E_SMI "e_smi")
-set(E_SMI_COMPONENT "lib${E_SMI}")
+set (REAL_NAME "hsmp-amd")
+set(E_SMI_COMPONENT "lib${REAL_NAME}")
 set(E_SMI_TARGET "${E_SMI}64")
-set(E_SMI_STATIC "${E_SMI_TARGET}_static")
+set(E_SMI_LIB "${REAL_NAME}")
+set(E_SMI_STATIC "${REAL_NAME}_static")
 set(CMAKE_C_FLAGS "-Wall")
 
 if(${USE_CLANG})
@@ -39,9 +43,11 @@ set(PKG_VERSION_GIT_TAG_PREFIX "esmi_pkg_ver")
 
 set(ENV{ESMI_BUILD_ID} "${ESMI_BUILD_ID}")
 
-# provide git to utilities
-find_program (GIT NAMES git)
-get_package_version_number("1.0.0.0" ${PKG_VERSION_GIT_TAG_PREFIX} GIT)
+# provide a version fallback if Git or default version info is n/a.
+if (NOT DEFINED FB_VERSION)
+	set (FB_VERSION "1.0.0.0")
+endif()
+get_package_version_number("${FB_VERSION}" ${PKG_VERSION_GIT_TAG_PREFIX})
 message("Package version: ${PKG_VERSION_STR}")
 
 # Debian package specific variables
@@ -68,12 +74,16 @@ set(Magenta "${Esc}[35m")
 ##  e_smi_lib-dev
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
 	CACHE STRING "Location of E-SMI source code.")
-set(CMAKE_INSTALL_PREFIX "/opt/e-sms"
+set(CMAKE_INSTALL_PREFIX "/usr"
                                 CACHE STRING "Default installation directory.")
 set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/e-sms"
                                       CACHE STRING "Default packaging prefix.")
 
-project(${E_SMI_TARGET})
+project(${REAL_NAME})
+include(GNUInstallDirs)
+message("LD_RUN_PATH=${CMAKE_LIBRARY_ARCHITECTURE}")
+SET(CMAKE_EXE_LINKER_FLAGS
+	"${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath -Wl,\$ORIGIN:\$ORIGIN/../lib/${CMAKE_LIBRARY_ARCHITECTURE}")
 
 set(E_SMI_HSMP_INC "${PROJECT_SOURCE_DIR}/include/asm/amd_hsmp.h")
 
@@ -104,7 +114,7 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
 endif()
 
 if (NOT E_SMI_PACKAGE)
-    set(E_SMI_PACKAGE e_smi_lib64)
+    set(E_SMI_PACKAGE ${REAL_NAME})
 endif()
 
 set(CPACK_PACKAGE_FILE_NAME "${E_SMI_PACKAGE}-${PKG_VERSION_STR}")
@@ -133,55 +143,47 @@ set(SMI_SRC_LIST ${SMI_SRC_LIST} "${SRC_DIR}/e_smi_utils.c")
 set(SMI_SRC_LIST ${SMI_SRC_LIST} "${SRC_DIR}/e_smi_plat.c")
 
 set(SMI_TOOL "e_smi_tool")
+set(SMI_TOOL_STATIC "e_smi_tool_static")
 
 add_executable(${SMI_TOOL} "tools/e_smi_tool.c")
+set_target_properties(${SMI_TOOL} PROPERTIES OUTPUT_NAME "${REAL_NAME}")
+target_link_libraries(${SMI_TOOL} ${E_SMI_LIB})
 
 ## If the tool to be linked with Static library
 if ("${ENABLE_STATIC_LIB}" STREQUAL 1)
-    target_link_libraries(${SMI_TOOL} ${E_SMI_STATIC})
-else ()
-    target_link_libraries(${SMI_TOOL} ${E_SMI_TARGET})
+	add_executable(${SMI_TOOL_STATIC} "tools/e_smi_tool.c")
+		target_link_libraries(${SMI_TOOL_STATIC} ${E_SMI_STATIC})
+	set_target_properties(${SMI_TOOL_STATIC} PROPERTIES OUTPUT_NAME "${REAL_NAME}_static")
 endif ()
 
-add_library(${E_SMI_TARGET} SHARED ${SMI_SRC_LIST} ${SMI_INC_LIST})
-target_link_libraries(${E_SMI_TARGET} pthread rt m)
+add_library(${E_SMI_LIB} SHARED ${SMI_SRC_LIST} ${SMI_INC_LIST})
+target_link_libraries(${E_SMI_LIB} pthread rt m)
 
 ## Set the VERSION and SOVERSION values
-set_property(TARGET ${E_SMI_TARGET} PROPERTY
+set_property(TARGET ${E_SMI_LIB} PROPERTY
                 SOVERSION "${VERSION_MAJOR}")
-set_property(TARGET ${E_SMI_TARGET} PROPERTY
+set_property(TARGET ${E_SMI_LIB} PROPERTY
                 VERSION "${SO_VERSION_STRING}")
-
-## If the library is a release, strip the target library
-if ("${CMAKE_BUILD_TYPE}" STREQUAL Release)
-    add_custom_command(
-          TARGET ${E_SMI_TARGET}
-          POST_BUILD COMMAND ${CMAKE_STRIP} lib${E_SMI_TARGET}.so)
-endif ()
 
 ## If the library to be build as a Static
 if ("${ENABLE_STATIC_LIB}" STREQUAL 1)
     add_library(${E_SMI_STATIC} STATIC ${SMI_SRC_LIST} ${SMI_INC_LIST})
     target_link_libraries(${E_SMI_STATIC} pthread rt m)
+	set_target_properties(${E_SMI_STATIC} PROPERTIES OUTPUT_NAME ${E_SMI_LIB})
     install(TARGETS ${E_SMI_STATIC}
-          ARCHIVE DESTINATION ${E_SMI}/lib/static COMPONENT ${E_SMI_COMPONENT})
+          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${E_SMI_COMPONENT})
 endif ()
 
 ## Add the install directives for the runtime library.
-if (${CMAKE_INSTALL_PREFIX} STREQUAL /opt/e-sms)
-install(TARGETS ${E_SMI_TARGET}
-          LIBRARY DESTINATION ${E_SMI}/lib COMPONENT ${E_SMI_COMPONENT})
-install(FILES ${SOURCE_DIR}/include/e_smi/e_smi.h
-                                        DESTINATION e_smi/include/e_smi)
-install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${SMI_TOOL}
-					DESTINATION ${E_SMI}/bin)
-else ()
-install(TARGETS ${E_SMI_TARGET}
-          LIBRARY DESTINATION lib COMPONENT ${E_SMI_COMPONENT})
-install(FILES ${SOURCE_DIR}/include/e_smi/e_smi.h
-                                        DESTINATION include/e_smi)
-install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${SMI_TOOL}
-					DESTINATION bin)
+get_target_property(PROG_NAME ${SMI_TOOL} OUTPUT_NAME)
+get_target_property(PROG_NAME_STATIC ${SMI_TOOL_STATIC} OUTPUT_NAME)
+install(TARGETS ${E_SMI_LIB}
+          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${E_SMI_COMPONENT})
+install(FILES ${SOURCE_DIR}/include/e_smi/e_smi.h TYPE INCLUDE
+	RENAME "${E_SMI_LIB}.h")
+install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PROG_NAME} TYPE BIN)
+if ("${ENABLE_STATIC_LIB}" STREQUAL 1)
+install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PROG_NAME_STATIC} TYPE BIN)
 endif()
 
 # Generate Doxygen documentation
@@ -226,19 +228,16 @@ else()
   message("Doxygen is not found. Will not generate documents.")
 endif(DOXYGEN_FOUND)
 
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/ESMI_Manual.pdf
-			DESTINATION ${E_SMI}/doc/)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/README.md
-			DESTINATION ${E_SMI}/doc/)
-
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/ESMI_IB_Release_Notes.pdf
-			DESTINATION ${E_SMI}/doc/)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/RELEASENOTES.md
-			DESTINATION ${E_SMI}/doc/)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/ESMI_Manual.pdf TYPE DOC
+	RENAME "manual.pdf")
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/README.md TYPE DOC
+	RENAME "README.md")
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/docs/RELEASENOTES.md TYPE DOC
+	RENAME "release-notes.md")
 
 # Install license file with documentation
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/COPYING
-			DESTINATION ${E_SMI}/doc/)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/COPYING TYPE DOC
+	RENAME "copyright")
 
 # General package specific variables
 set(CPACK_GENERATOR "DEB;RPM"  CACHE STRING "Default packaging generators.")
@@ -252,18 +251,12 @@ set(CPACK_RPM_PACKAGE_LICENSE "NCSA")
 
 # DEB package specific variables
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
-set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA
-    "${CMAKE_CURRENT_SOURCE_DIR}/DEBIAN/postinst;${CMAKE_CURRENT_SOURCE_DIR}/DEBIAN/prerm")
 set(CPACK_DEBIAN_PACKAGE_NAME  ${E_SMI_PACKAGE})
 set(CPACK_DEBIAN_PACKAGE_VERSION ${PKG_VERSION_STR})
 
 # RPM package specific variables
 set(CPACK_RPM_PACKAGE_ARCHITECTURE "x86_64")
 set(CPACK_RPM_PACKAGE_AUTOREQ "no")
-set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE
-       "${CMAKE_CURRENT_SOURCE_DIR}/RPM/rpm_post")
-set(CPACK_RPM_POST_UNINSTALL_SCRIPT_FILE
-       "${CMAKE_CURRENT_SOURCE_DIR}/RPM/rpm_postun")
 set(CPACK_RPM_PACKAGE_NAME  ${E_SMI_PACKAGE})
 set(CPACK_RPM_PACKAGE_VERSION ${PKG_VERSION_STR})
 

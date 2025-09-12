@@ -5,6 +5,7 @@
 ##
 ## Copyright (c) 2020-2023, Advanced Micro Devices, Inc. All rights reserved.
 ##
+## Portions Copyright (c) 2025 Jens Elkner, OvGU Magdeburg.
 ################################################################################
 
 ## Parses the VERSION_STRING variable and places
@@ -24,113 +25,90 @@ function( parse_version VERSION_STRING )
 
     if ( ${VERSION_COUNT} GREATER 0)
         list ( GET VERSIONS 0 MAJOR )
-        set ( VERSION_MAJOR ${MAJOR} PARENT_SCOPE )
-        set ( TEMP_VERSION_STRING "${MAJOR}" )
+    else()
+		set ( MAJOR "0" )
     endif ()
 
     if ( ${VERSION_COUNT} GREATER 1 )
         list ( GET VERSIONS 1 MINOR )
-        set ( VERSION_MINOR ${MINOR} PARENT_SCOPE )
-        set ( TEMP_VERSION_STRING "${TEMP_VERSION_STRING}.${MINOR}" )
+    else()
+		set ( MINOR "0" )
     endif ()
 
     if ( ${VERSION_COUNT} GREATER 2 )
         list ( GET VERSIONS 2 PATCH )
-        set ( VERSION_PATCH ${PATCH} PARENT_SCOPE )
-        set ( TEMP_VERSION_STRING "${TEMP_VERSION_STRING}.${PATCH}" )
+    else()
+		set ( PATCH "0" )
     endif ()
 
-    set ( VERSION_STRING "${TEMP_VERSION_STRING}" PARENT_SCOPE )
-
+	set ( VERSION_MAJOR ${MAJOR} PARENT_SCOPE )
+	set ( VERSION_MINOR ${MINOR} PARENT_SCOPE )
+	set ( VERSION_PATCH ${PATCH} PARENT_SCOPE )
+	set ( VERSION_STRING "${MAJOR}.${MINOR}.${PATCH}" PARENT_SCOPE )
+	set ( VERSION_BUILD "${VERSION_BUILD}" PARENT_SCOPE )
 endfunction ()
+
+function (getCommitHash)
+	if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.commit")
+		execute_process (COMMAND git rev-parse --short HEAD
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			OUTPUT_VARIABLE GIT_HASH
+			OUTPUT_STRIP_TRAILING_WHITESPACE
+			RESULT_VARIABLE RESULT )
+	else()
+		execute_process(COMMAND cat .commit
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			OUTPUT_VARIABLE GIT_HASH
+			OUTPUT_STRIP_TRAILING_WHITESPACE
+			RESULT_VARIABLE RESULT )
+	endif()
+	if (NOT DEFINED GIT_HASH)
+		set(GIT_HASH "unknown")
+	endif()
+	set( COMMIT_HASH "${GIT_HASH}" PARENT_SCOPE)
+endfunction()
 
 ## Gets the current version of the repository
 ## using versioning tags and git describe.
 ## Passes back a packaging version string
 ## and a library version string.
-function(get_version_from_tag DEFAULT_VERSION_STRING VERSION_PREFIX GIT)
-
-    parse_version ( ${DEFAULT_VERSION_STRING} )
-    if ( GIT )
-        execute_process ( COMMAND git describe --tags --dirty --long --match ${VERSION_PREFIX}-[0-9.]*
-                          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                          OUTPUT_VARIABLE GIT_TAG_STRING
-                          OUTPUT_STRIP_TRAILING_WHITESPACE
-                          RESULT_VARIABLE RESULT )
-
-        if ( ${RESULT} EQUAL 0 )
-
-            parse_version ( ${GIT_TAG_STRING} )
-
-        endif ()
-
-    endif ()
-
-    set( VERSION_STRING "${VERSION_STRING}" PARENT_SCOPE )
-    set( VERSION_MAJOR  "${VERSION_MAJOR}" PARENT_SCOPE )
-    set( VERSION_MINOR  "${VERSION_MINOR}" PARENT_SCOPE )
-    set( VERSION_PATCH  "${VERSION_PATCH}" PARENT_SCOPE )
+## Vendors may use PKG_VERSION_SN to add another digit to the version string.
+function(get_version_from_tag DEFAULT_VERSION_STRING VERSION_PREFIX)
+	if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.version")
+		execute_process (COMMAND cat .version
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			OUTPUT_VARIABLE GIT_TAG_STRING
+			OUTPUT_STRIP_TRAILING_WHITESPACE
+			RESULT_VARIABLE RESULT )
+	endif()
+	getCommitHash()
+	if ("${COMMIT_HASH}" STREQUAL "unknown")
+		if (DEFINED VERSION_BUILD)
+			set(COMMIT_HASH "${VERSION_BUILD}")
+		endif()
+	endif()
+	if (NOT DEFINED GIT_TAG_STRING)
+		set(GIT_TAG_STRING "${VERSION_PREFIX}-${DEFAULT_VERSION_STRING}-${COMMIT_HASH}")
+	endif()
+	message("Using version: ${GIT_TAG_STRING}")
+	parse_version ( ${GIT_TAG_STRING} )
+	if (DEFINED PKG_VERSION_SN)
+		set(VERSION_STRING "${VERSION_STRING}.${PKG_VERSION_SN}" PARENT_SCOPE)
+	else()
+		set(VERSION_STRING "${VERSION_STRING}" PARENT_SCOPE )
+	endif()
+	set( VERSION_MAJOR  "${VERSION_MAJOR}" PARENT_SCOPE )
+	set( VERSION_MINOR  "${VERSION_MINOR}" PARENT_SCOPE )
+	set( VERSION_PATCH  "${VERSION_PATCH}" PARENT_SCOPE )
+	set( COMMIT_HASH "${COMMIT_HASH}" PARENT_SCOPE)
 endfunction()
 
-function(num_change_since_prev_pkg VERSION_PREFIX)
-    find_program(get_commits NAMES version_util.sh
-                 PATHS ${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules)
-    if (get_commits)
-       execute_process( COMMAND ${get_commits} -c ${VERSION_PREFIX}
-                          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                          OUTPUT_VARIABLE NUM_COMMITS
-                          OUTPUT_STRIP_TRAILING_WHITESPACE
-                          RESULT_VARIABLE RESULT )
+function(get_package_version_number DEFAULT_VERSION_STRING VERSION_PREFIX)
+    get_version_from_tag(${DEFAULT_VERSION_STRING} ${VERSION_PREFIX})
 
-        set(NUM_COMMITS "${NUM_COMMITS}" PARENT_SCOPE )
-
-        if ( ${RESULT} EQUAL 0 )
-          message("${NUM_COMMITS} commit/s found since previous release")
-        else()
-          message("Unable to determine number of commits since previous release")
-        endif()
-    else()
-        message("WARNING: Didn't find version_util.sh")
-        set(NUM_COMMITS "unknown" PARENT_SCOPE )
-    endif()
-endfunction()
-
-function(get_package_version_number DEFAULT_VERSION_STRING VERSION_PREFIX GIT)
-    get_version_from_tag(${DEFAULT_VERSION_STRING} ${VERSION_PREFIX} GIT)
-    num_change_since_prev_pkg(${VERSION_PREFIX})
-
-    set(PKG_VERSION_STR "${VERSION_STRING}.${NUM_COMMITS}")
-    if (DEFINED ESMI_BUILD_ID)
-	    set(VERSION_ID $ENV{ESMI_BUILD_ID})
-    else()
-        set(VERSION_ID "local-build-0")
-    endif()
-
-    set( VERSION_ID  "${VERSION_ID}" PARENT_SCOPE )
-    set(PKG_VERSION_STR "${PKG_VERSION_STR}.${VERSION_ID}")
-
-    if (GIT)
-        execute_process(COMMAND git rev-parse --short HEAD
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        OUTPUT_VARIABLE VERSION_HASH
-                        OUTPUT_STRIP_TRAILING_WHITESPACE
-                        RESULT_VARIABLE RESULT )
-        if( ${RESULT} EQUAL 0 )
-            # Check for dirty workspace.
-            execute_process(COMMAND git diff --quiet
-                            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                            RESULT_VARIABLE RESULT )
-            if(${RESULT} EQUAL 1)
-                set(VERSION_HASH "${VERSION_HASH}-dirty")
-            endif()
-        else()
-            set( VERSION_HASH "unknown" )
-        endif()
-    else()
-        set( VERSION_HASH "unknown" )
-    endif()
-    set(PKG_VERSION_STR "${PKG_VERSION_STR}-${VERSION_HASH}")
-    set(PKG_VERSION_STR ${PKG_VERSION_STR} PARENT_SCOPE)
+    set(VERSION_ID  "${COMMIT_HASH}" PARENT_SCOPE )
+	set(VERSION_STR "${VERSION_STRING}" PARENT_SCOPE)
+	set(PKG_VERSION_STR "${VERSION_STRING}" PARENT_SCOPE)
     set(VERSION_STRING "${VERSION_STRING}" PARENT_SCOPE)
     set(VERSION_MAJOR  "${VERSION_MAJOR}" PARENT_SCOPE)
     set(VERSION_MINOR  "${VERSION_MINOR}" PARENT_SCOPE)

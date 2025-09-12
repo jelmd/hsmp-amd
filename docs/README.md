@@ -16,7 +16,7 @@ The source code for E-SMI library is available at [Github](https://github.com/am
 ## Directory stucture of the source
 Once the E-SMI library source has been cloned to a local Linux machine, the directory structure of source is as below:
 * `$ docs/` Contains Doxygen configuration files and Library descriptions
-* `$ tools/` Contains e-smi tool, based on the E-SMI library
+* `$ tools/` Contains hsmp-amd tool, based on the E-SMI library
 * `$ include/` Contains the header files used by the E-SMI library
 * `$ src/` Contains library E-SMI source
 * `$ cmake_modules/` Contains helper utilities for determining package and library version
@@ -42,14 +42,13 @@ Building the library as a static(.a) along with shared libraries(.so) is achieve
 * `$ make`
 
 
- The built library `libe_smi64_static.a`, `libe_smi64.so.X.Y` and `esmi_tool` will appear in the `build` directory
+ The built library `libhdmp-amd.a`, `libhdmp-amd.so.X.Y`, ` hsmp-amd_static`, and `hsmp-amd` will appear in the `build` directory
 
 * `$ sudo make install`
 
- By default library file, header and tool are installed at /opt/e-sms.
+ By default library file, header and tool are installed at /usr/.
  To change the default installation path, build with cmake -DCMAKE_INSTALL_PREFIX=xxxx.
- Library will be installed at xxxx/lib, tool will be installed at xxxx/bin, header will be installed at xxxx/include and doc will be installed at xxxx/e-sms/doc.
- Example: If -DCMAKE_INSTALL_PREFIX=/usr/local then esmi lib, esmi_tool binary and headers are installed at /usr/local/lib, /usr/local/bin, /usr/local/include respectively.
+ Example: If -DCMAKE_INSTALL_PREFIX=/usr/local then esmi lib, hsmp-amd binary and headers are installed at /usr/local/lib, /usr/local/bin, /usr/local/include respectively.
 
 `Note:`
  Library is dependent on amd_hsmp.h header and without this, compilation will break. Please follow the instruction in "Kernel dependencies" section
@@ -155,7 +154,7 @@ Below is a simple "Hello World" type program that display the Average Power of S
 ```c
 #include <stdio.h>
 #include <stdint.h>
-#include <e_smi/e_smi.h>
+#include <hsmp-amd.h>
 #include <e_smi/e_smi_monitor.h>
 
 int main()
@@ -189,12 +188,12 @@ int main()
 }
 ```
 # Tool Usage
-E-SMI tool is a C program based on the E-SMI In-band Library, the executable "e_smi_tool" will be generated in the build/ folder.
+E-SMI tool is a C program based on the E-SMI In-band Library, the executable "hsmp-amd" will be generated in the build/ folder.
 This tool provides options to Monitor and Control System Management functionality.
 
 Below is a sample usage to dump core and socket metrics
 ```
-	e_smi_library/b$ sudo ./e_smi_tool
+	e_smi_library/b$ sudo ./hsmp-amd
 
 	============================= E-SMI ===================================
 
@@ -293,7 +292,7 @@ Below is a sample usage to dump core and socket metrics
 
 
 
-	Try `./e_smi_tool --help' for more information.
+	Try `./hsmp-amd --help' for more information.
 
 ```
 
@@ -432,7 +431,7 @@ Following are the value ranges and other information needed for passing it to to
 Below is a sample usage to get different system metrics information
 ```
 
-1.	e_smi_library/b$ sudo ./e_smi_tool --showcoreenergy 0
+1.	e_smi_library/b$ sudo ./hsmp-amd --showcoreenergy 0
 
 	============================= E-SMI ===================================
 
@@ -442,7 +441,7 @@ Below is a sample usage to get different system metrics information
 
 	============================= End of E-SMI ============================
 
-2.	e_smi_library/b$ sudo ./e_smi_tool --showcoreenergy 12 --showsockpower --setpowerlimit 1 220000 --showsockpower
+2.	e_smi_library/b$ sudo ./hsmp-amd --showcoreenergy 12 --showsockpower --setpowerlimit 1 220000 --showsockpower
 
 	============================= E-SMI ===================================
 
@@ -468,7 +467,7 @@ Below is a sample usage to get different system metrics information
 	| PowerLimitMax (Watts)          | 400.000          | 320.000          |
 	------------------------------------------------------------------------
 
-3. 	e_smi_library/b$$ ./e_smi_tool --showxgmibandwidth G2 AGG_BW
+3. 	e_smi_library/b$$ ./hsmp-amd --showxgmibandwidth G2 AGG_BW
 
 	============================= E-SMI ===================================
 
@@ -479,7 +478,7 @@ Below is a sample usage to get different system metrics information
 
 	============================= End of E-SMI ============================
 
-4.	e_smi_library/b$sudo ./e_smi_tool --setdfpstaterange 0 1 2
+4.	e_smi_library/b$sudo ./hsmp-amd --setdfpstaterange 0 1 2
 	[sudo] password for user:
 
 	============================= E-SMI ===================================
@@ -488,7 +487,7 @@ Below is a sample usage to get different system metrics information
 
 	============================= End of E-SMI ============================
 
-5.	e_smi_library/b$./e_smi_tool --showsockpower --showprochotstatus --loopdelay 1 s --loopcount 10 --log power.csv --printonconsole 0
+5.	e_smi_library/b$./hsmp-amd --showsockpower --showprochotstatus --loopdelay 1 s --loopcount 10 --log power.csv --printonconsole 0
 
 	e_smi_library/b$cat power.csv
 	2025-06-10,12:39:37:88,45.951,43.225,400.000,400.000,500.000,500.000,inactive,inactive,
@@ -502,7 +501,7 @@ Below is a sample usage to get different system metrics information
 	2025-06-10,12:39:45:148,39.726,39.457,400.000,400.000,500.000,500.000,inactive,inactive,
 	2025-06-10,12:39:46:160,39.393,38.699,400.000,400.000,500.000,500.000,inactive,inactive,
 
-6.	e_smi_library/b$./e_smi_tool --showsockc0res 0 --showcorebl 0 --showsockc0res 1 --json
+6.	e_smi_library/b$./hsmp-amd --showsockc0res 0 --showcorebl 0 --showsockc0res 1 --json
 	{
     	    {
                 "Socket":0,
@@ -521,7 +520,7 @@ Below is a sample usage to get different system metrics information
             }
 	}
 
-7.	e_smi_library/b$./e_smi_tool --showsockc0res 0 --showcorebl 0 --showsockc0res 1 --csv
+7.	e_smi_library/b$./hsmp-amd --showsockc0res 0 --showcorebl 0 --showsockc0res 1 --csv
 	Socket,C0Residency(%)
 	0,0
 	Core,BoostLimit(MHz)
@@ -530,7 +529,7 @@ Below is a sample usage to get different system metrics information
 	1,0
 
 8.	//To display the data in the console for a specified number of user-defined loops and loop delay.
-	e_smi_library/b$./e_smi_tool --showsockpower --initialdelay 2 s --loopdelay 1 s --loopcount 2
+	e_smi_library/b$./hsmp-amd --showsockpower --initialdelay 2 s --loopdelay 1 s --loopcount 2
 
 	============================= E-SMI ===================================
 
@@ -561,7 +560,7 @@ Below is a sample usage to get different system metrics information
 	------------------------------------------------------------------------
 
 9.	//To output the data to the console and simultaneously record it in log(CSV format) for user-defined loops and loop delay.
-	e_smi_library/b$./e_smi_tool --showsockpower --initialdelay 2 s --loopdelay 1 s --loopcount 2 --log power.csv
+	e_smi_library/b$./hsmp-amd --showsockpower --initialdelay 2 s --loopdelay 1 s --loopcount 2 --log power.csv
 
 	============================= E-SMI ===================================
 
@@ -598,7 +597,7 @@ Below is a sample usage to get different system metrics information
 
 10.	//To continuously collect data in the log(CSV format) without interruption until the exit condition is met(such as detecting a stoploop file).
 	[Terminal 1]:
-	  e_smi_library/b$./e_smi_tool --showsockpower --loopdelay 1 s --loopcount -1 --log power.csv --printonconsole 0 --stoploop stresslog.txt
+	  e_smi_library/b$./hsmp-amd --showsockpower --loopdelay 1 s --loopcount -1 --log power.csv --printonconsole 0 --stoploop stresslog.txt
 
 	[Terminal 2]:
 	  //Consider the user initiates a stress test for a random duration, which generates a stresslog.txt file upon completion of stress test.
@@ -606,7 +605,7 @@ Below is a sample usage to get different system metrics information
 	  e_smi_library/b$touch stresslog.txt
 
 	[Terminal 1]:
-	  //The execution of e_smi_tool should have concluded by now, allowing the user to examine power.csv file generated during the stress test.
+	  //The execution of hsmp-amd should have concluded by now, allowing the user to examine power.csv file generated during the stress test.
 	  e_smi_library/b$cat power.csv
 	  Date,Timestamp,Socket0:Power(Watts),Socket1:Power(Watts),Socket0:PowerLimit(Watts),Socket1:PowerLimit(Watts),Socket0:PowerLimitMax(Watts),Socket1:PowerLimitMax(Watts),
 	  2025-06-13,11:53:53:245,40.082,39.281,400.000,400.000,500.000,500.000,
@@ -618,7 +617,7 @@ Below is a sample usage to get different system metrics information
 	  2025-06-13,11:53:59:265,41.472,40.382,400.000,400.000,500.000,500.000,
 
 11.	//To continuously display the data in the console for an indefinite duration (press CTRL+C to stop).
-	e_smi_library/b$./e_smi_tool --showsockpower --loopdelay 1 s --loopcount -1
+	e_smi_library/b$./hsmp-amd --showsockpower --loopdelay 1 s --loopcount -1
 
 	============================= E-SMI ===================================
 
