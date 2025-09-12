@@ -138,13 +138,13 @@ char * esmi_get_err_msg(esmi_status_t esmi_err)
 		case ESMI_SUCCESS:
 			return "Success";
 		case ESMI_NO_ENERGY_DRV:
-			return "Energy driver not present";
+			return "amd_energy, or msr_safe, or msr kernel module loaded ?";
 		case ESMI_NO_MSR_DRV:
-			return "MSR driver not present";
+			return "msr_safe or msr kernel module loaded ?";
 		case ESMI_NO_HSMP_DRV:
-			return "HSMP driver not present";
+			return "amd_hsmp kernel module loaded ?";
 		case ESMI_NO_DRV:
-			return "Both Energy, HSMP drivers not present";
+			return "Both amd_hsmp, and amd_energy kernel module loaded ?";
 		case ESMI_FILE_NOT_FOUND:
 			return "Entry not found";
 		case ESMI_DEV_BUSY:
