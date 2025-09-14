@@ -172,21 +172,24 @@ static int write_msr_allowlist_file()
 	int fd;
 	int ret;
 
-	if (!access(ALLOWLIST_FILE, F_OK)) {
+	if (access(ALLOWLIST_FILE, F_OK) == 0) {
 		fd = open(ALLOWLIST_FILE, O_RDWR);
 		if (fd < 0) {
-			printf("Error in opening msr allowlist: %s\n", strerror(errno));
+			printf("Error in opening " ALLOWLIST_FILE ": %s\n",strerror(errno));
 			return errno;
 		}
 		ret = write(fd, allowlistcontent, strlen(allowlistcontent));
 		if (ret < 0) {
-			printf("Error in writing msr allowlist: %s\n", strerror(errno));
+			printf("Error in writing " ALLOWLIST_FILE ": %s\n",strerror(errno));
 			return errno;
 		}
 
 		close(fd);
+		printf("Successfully added msr allowlist.\n");
+	} else  {
+		printf(ALLOWLIST_FILE " not found - may be the msr_safe kernel module"
+			" is not loaded/available.\n");
 	}
-	printf("Successfully added msr allowlist.\n");
 
 	return ESMI_SUCCESS;
 }
