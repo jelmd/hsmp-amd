@@ -4042,20 +4042,24 @@ static int parsesmi_args(int argc,char **argv)
 	optind = 0;
 	char* err_string = NULL;
 	int ret_on_err = ESMI_INVALID_INPUT;
+	int opts_seen = 0;
 	bool need_help = false;
+	bool need_version = false;
 	bool show_usage_on_err = false;
 	while ((opt = getopt_long(argc, argv, helperstring,
 			long_options, &long_index)) != -1)
 	{
 		char temp_string[300];
+		opts_seen++;
 		if (opt == ':')
 		{
 			/* missing option argument */
 			sprintf(temp_string, "%s: option '-%c' requires an argument.\n\n", argv[0], opt);
 			append_string(&err_string, temp_string);
 			break;
-		}
-		else if (opt == 'h') {
+		} else if (opt == 'V') {
+			need_version = true;
+		} else if (opt == 'h') {
 			need_help = true;
 		}
 		else if (opt == '?')
@@ -4454,6 +4458,11 @@ static int parsesmi_args(int argc,char **argv)
 	}
 
 	show_smi_message();
+	if (need_version) {
+		print_esmi_version();
+		if (opts_seen > 1)
+			printf("\n");
+	}
 	if(err_string)
 	{
 		printf(MAG "%s" RESET, err_string);
@@ -4807,7 +4816,6 @@ static int parsesmi_args(int argc,char **argv)
 			ret = ESMI_SUCCESS;
 			break;
 		case 'V' :
-			print_esmi_version();
 			ret = ESMI_SUCCESS;
 			break;
 		case 'W' :
