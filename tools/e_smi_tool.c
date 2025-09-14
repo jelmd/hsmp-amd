@@ -3251,197 +3251,219 @@ static esmi_status_t epyc_get_svi3_vr_temp(uint32_t sock_ind, uint8_t svi3_rail_
 
 static char* const feat_comm[] = {
 	"Output Option<s>:",
-	"  -h, --help\t\t\t\t\t\t\tShow this help message",
-	"  -A, --showall\t\t\t\t\t\t\tShow all esmi parameter values",
-	"  -V  --version \t\t\t\t\t\tShow e-smi library version",
-	"  --testmailbox [SOCKET] [VALUE<0-0xFFFFFFFF>]\t\t\tTest HSMP mailbox interface",
-	"  --writemsrallowlist \t\t\t\t\t\tWrite msr-safe allowlist file",
-	"  --json\t\t\t\t\t\t\tPrint output on console as json format[applicable only for get commands]",
-	"  --csv\t\t\t\t\t\t\t\tPrint output on console as csv format[applicable only for get commands]",
-	"  --initialdelay [INITIAL_DELAY] <TIME_RANGE<ms,s,m,h,d>>\tInitial delay before start of execution",
-	"  --loopdelay    [LOOP_DELAY]    <TIME_RANGE<ms,s,m,h,d>>\tLoop delay before executing each loop",
-	"  --loopcount    [LOOP_COUNT]\t\t\t\t\tSet the loop count to the specified value[pass \"-1\" for infinite loop]",
-	"  --stoploop     [STOPLOOP_FILE_NAME]\t\t\t\tSet the StopLoop file name, loop will stop once the stoploop file is available",
-	"  --printonconsole [ENABLE_PRINT<0-1>]\t\t\t\tPrint output on console if set to 1, or 0 to suppress the console output",
-	"  --log [LOG_FILE_NAME]\t\t\t\t\t\tSet the Log file name, in which the data collected need to be logged\n",
+	"-h, --help@Show this help message",
+	"-A, --showall@Show all esmi parameter values",
+	"-V  --version@Show e-smi library version",
+	"--testmailbox [SOCKET] [VALUE<0-0xFFFFFFFF>]@Test HSMP mailbox interface",
+	"--writemsrallowlist@Write msr-safe allowlist file",
+	"--json@Print output on console as json format[applicable only for get commands]",
+	"--csv@Print output on console as csv format[applicable only for get commands]",
+	"--initialdelay [INITIAL_DELAY] <TIME_RANGE<ms,s,m,h,d>>@Initial delay before start of execution",
+	"--loopdelay    [LOOP_DELAY]    <TIME_RANGE<ms,s,m,h,d>>\tLoop delay before executing each loop",
+	"--loopcount    [LOOP_COUNT]@Set the loop count to the specified value[pass \"-1\" for infinite loop]",
+	"--stoploop     [STOPLOOP_FILE_NAME]@Set the StopLoop file name, loop will stop once the stoploop file is available",
+	"--printonconsole [ENABLE_PRINT<0-1>]@Print output on console if set to 1, or 0 to suppress the console output",
+	"--log [LOG_FILE_NAME]@Set the Log file name, in which the data collected need to be logged\n",
 };
 
 static char* const feat_energy[] = {
 	"Get Option<s>:",
-	"  --showcoreenergy [CORE]\t\t\t\t\tShow energy for a given CPU (Joules)",
-	"  --showsockenergy\t\t\t\t\t\tShow energy for all sockets (KJoules)",
+	"--showcoreenergy [CORE]@Show energy for a given CPU (Joules)",
+	"--showsockenergy@Show energy for all sockets (KJoules)",
 };
 
 static char* const feat_ver2_get[] = {
-	"  --showsockpower\t\t\t\t\t\tShow power metrics for all sockets (Watts)",
-	"  --showcorebl [CORE]\t\t\t\t\t\tShow Boostlimit for a given CPU (MHz)",
-	"  --showsockc0res [SOCKET]\t\t\t\t\tShow C0Residency for a given socket (%%)",
-	"  --showsmufwver\t\t\t\t\t\tShow SMU FW Version",
-	"  --showhsmpdriverver\t\t\t\t\t\tShow HSMP Driver Version",
-	"  --showhsmpprotover\t\t\t\t\t\tShow HSMP Protocol Version",
-	"  --showprochotstatus\t\t\t\t\t\tShow HSMP PROCHOT status for all sockets",
-	"  --showclocks\t\t\t\t\t\t\tShow Clock Metrics (MHz) for all sockets",
+	"--showsockpower@Show power metrics for all sockets (Watts)",
+	"--showcorebl [CORE]@Show Boostlimit for a given CPU (MHz)",
+	"--showsockc0res [SOCKET]@Show C0Residency for a given socket (%%)",
+	"--showsmufwver@Show SMU FW Version",
+	"--showhsmpdriverver@Show HSMP Driver Version",
+	"--showhsmpprotover@Show HSMP Protocol Version",
+	"--showprochotstatus@Show HSMP PROCHOT status for all sockets",
+	"--showclocks@Show Clock Metrics (MHz) for all sockets",
 };
 
 static char* const feat_ver2_set[] = {
 	"Set Option<s>:",
-	"  --setpowerlimit [SOCKET] [POWER]\t\t\t\tSet power limit"
+	"--setpowerlimit [SOCKET] [POWER]@Set power limit"
 	" for a given socket (mWatts)",
-	"  --setcorebl [CORE] [BOOSTLIMIT]\t\t\t\tSet boost limit"
+	"--setcorebl [CORE] [BOOSTLIMIT]@Set boost limit"
 	" for a given core (MHz)",
-	"  --setsockbl [SOCKET] [BOOSTLIMIT]\t\t\t\tSet Boost"
+	"--setsockbl [SOCKET] [BOOSTLIMIT]@Set Boost"
 	" limit for a given Socket (MHz)",
-	"  --apbdisable [SOCKET] [PSTATE<0-2>]\t\t\t\tSet Data Fabric"
+	"--apbdisable [SOCKET] [PSTATE<0-2>]@Set Data Fabric"
 	" Pstate for a given socket",
-	"  --apbenable [SOCKET]\t\t\t\t\t\tEnable the Data Fabric performance"
+	"--apbenable [SOCKET]@Enable the Data Fabric performance"
 	" boost algorithm for a given socket",
-	"  --setxgmiwidth [SOCKET] [MIN<0-2>] [MAX<0-2>]\t\t\tSet xgmi link width"
+	"--setxgmiwidth [SOCKET] [MIN<0-2>] [MAX<0-2>]@Set xgmi link width"
 	" in a multi socket system (MAX >= MIN)",
-	"  --setlclkdpmlevel [SOCKET] [NBIOID<0-3>] [MIN<0-3>] [MAX<0-3>]Set lclk dpm level"
+	"--setlclkdpmlevel [SOCKET] [NBIOID<0-3>] [MIN<0-3>] [MAX<0-3>]@Set lclk"
+	" dpm level"
 	" for a given nbio in a given socket (MAX >= MIN)"
 };
 
 static char* const feat_ver3[] = {
-	"  --showddrbw\t\t\t\t\t\t\tShow DDR bandwidth details (Gbps)",
+	"--showddrbw@Show DDR bandwidth details (Gbps)",
 };
 
 static char* const feat_ver4[] = {
-	"  --showsockettemp\t\t\t\t\t\tShow Temperature monitor for all sockets ('C)",
+	"--showsockettemp@Show Temperature monitor for all sockets ('C)",
 };
 
 static char* const feat_ver5_get[] = {
-	"  --showdimmtemprange [SOCKET] [DIMM_ADDR]\t\t\tShow dimm temperature range and"
+	"--showdimmtemprange [SOCKET] [DIMM_ADDR]@Show dimm temperature range and"
 	" refresh rate for a given socket and dimm address",
-	"  --showdimmthermal [SOCKET] [DIMM_ADDR]\t\t\tShow dimm thermal values for a given socket"
+	"--showdimmthermal [SOCKET] [DIMM_ADDR]@Show dimm thermal values for a given socket"
 	" and dimm address",
-	"  --showdimmpower [SOCKET] [DIMM_ADDR]\t\t\t\tShow dimm power consumption for a given socket"
+	"--showdimmpower [SOCKET] [DIMM_ADDR]@Show dimm power consumption for a given socket"
 	" and dimm address",
-	"  --showcclkfreqlimit [CORE]\t\t\t\t\tShow current clock frequency limit(MHz) for a given core",
-	"  --showsvipower \t\t\t\t\t\tShow svi based power telemetry of all rails for all sockets",
-	"  --showiobw [SOCKET] [LINK<P0-P3,G0-G3>]\t\t\tShow IO aggregate bandwidth for a given socket and"
+	"--showcclkfreqlimit [CORE]@Show current clock frequency limit(MHz) for a given core",
+	"--showsvipower@Show svi based power telemetry of all rails for all sockets",
+	"--showiobw [SOCKET] [LINK<P0-P3,G0-G3>]@Show IO aggregate bandwidth for a given socket and"
 	" linkname",
-	"  --showlclkdpmlevel [SOCKET] [NBIOID<0-3>]\t\t\tShow lclk dpm level for a given nbio"
+	"--showlclkdpmlevel [SOCKET] [NBIOID<0-3>]@Show lclk dpm level for a given nbio"
 	" in a given socket",
-	"  --showsockclkfreqlimit [SOCKET]\t\t\t\tShow current clock frequency limit(MHz) for a given socket"
+	"--showsockclkfreqlimit [SOCKET]@Show current clock frequency limit(MHz) for a given socket"
 };
 
 static char* const feat_ver5_F1A_M50_5F_get[] = {
-	"  --showdimmtemprange [SOCKET] [DIMM_ADDR]\t\t\tShow dimm temperature range and"
+	"--showdimmtemprange [SOCKET] [DIMM_ADDR]@Show dimm temperature range and"
 	" refresh rate for a given socket and dimm address",
-	"  --showdimmthermal [SOCKET] [DIMM_ADDR]\t\t\tShow dimm thermal values for a given socket"
+	"--showdimmthermal [SOCKET] [DIMM_ADDR]@Show dimm thermal values for a given socket"
 	" and dimm address",
-	"  --showdimmpower [SOCKET] [DIMM_ADDR]\t\t\t\tShow dimm power consumption for a given socket"
+	"--showdimmpower [SOCKET] [DIMM_ADDR]@Show dimm power consumption for a given socket"
 	" and dimm address",
-	"  --showcclkfreqlimit [CORE]\t\t\t\t\tShow current clock frequency limit(MHz) for a given core",
-	"  --showsvipower \t\t\t\t\t\tShow svi based power telemetry of all rails for all sockets",
-	"  --showiobw [SOCKET] [LINK<P0-P2,P4-P5,G0-G2>]\t\t\tShow IO aggregate bandwidth for a given socket and"
+	"--showcclkfreqlimit [CORE]@Show current clock frequency limit(MHz) for a given core",
+	"--showsvipower@Show svi based power telemetry of all rails for all sockets",
+	"--showiobw [SOCKET] [LINK<P0-P2,P4-P5,G0-G2>]@Show IO aggregate bandwidth for a given socket and"
 	" linkname",
-	"  --showlclkdpmlevel [SOCKET] [NBIOID<0-3>]\t\t\tShow lclk dpm level for a given nbio"
+	"--showlclkdpmlevel [SOCKET] [NBIOID<0-3>]@Show lclk dpm level for a given nbio"
 	" in a given socket",
-	"  --showsockclkfreqlimit [SOCKET]\t\t\t\tShow current clock frequency limit(MHz) for a given socket"
+	"--showsockclkfreqlimit [SOCKET]@Show current clock frequency limit(MHz) for a given socket"
 };
 
 static char* const feat_ver5_F19_M00_0F_get[] = {
-	"  --showxgmibw [SOCKET] [LINK<P0-P3,G0-G3>] [BW<AGG_BW,RD_BW,WR_BW>]\tShow xGMI bandwidth for a given socket,"
+	"--showxgmibw [SOCKET] [LINK<P0-P3,G0-G3>] [BW<AGG_BW,RD_BW,WR_BW>]@Show xGMI bandwidth for a given socket,"
 	" linkname and bwtype"
 };
 
 static char* const feat_ver5_F19_M00_0F_set[] = {
-	"  --setpowerefficiencymode [SOCKET] [MODE<0-3>]\t\t\tSet power efficiency mode"
+	"--setpowerefficiencymode [SOCKET] [MODE<0-3>]@Set power efficiency mode"
 	" for a given socket",
 };
 
 static char* const feat_ver5_F1A_M00_1F_get[] = {
-	"  --showxgmibw [SOCKET] [LINK<P1,P3,G0-G3>] [BW<AGG_BW,RD_BW,WR_BW>]\tShow xGMI bandwidth for a given socket,"
+	"--showxgmibw [SOCKET] [LINK<P1,P3,G0-G3>] [BW<AGG_BW,RD_BW,WR_BW>]@Show xGMI bandwidth for a given socket,"
 	" linkname and bwtype",
-	"  --showcurrpwrefficiencymode [SOCKET]\t\t\t\tShow current power effciency mode",
-	"  --showcpurailisofreqpolicy [SOCKET]\t\t\t\tShow current CPU ISO frequency policy",
-	"  --showdfcstatectrl [SOCKET]\t\t\t\t\tShow current DF C-state status",
+	"--showcurrpwrefficiencymode [SOCKET]@Show current power effciency mode",
+	"--showcpurailisofreqpolicy [SOCKET]@Show current CPU ISO frequency policy",
+	"--showdfcstatectrl [SOCKET]@Show current DF C-state status",
 };
 
 static char* const feat_ver5_xgmibw_F1A_M50_5F_get[] = {
-	"  --showxgmibw [SOCKET] [LINK<P0-P2,G0-G2>] [BW<AGG_BW,RD_BW,WR_BW>]\tShow xGMI bandwidth for a given socket,"
-	" linkname and bwtype",
-	"  --showcurrpwrefficiencymode [SOCKET]\t\t\t\tShow current power effciency mode",
-	"  --showcpurailisofreqpolicy [SOCKET]\t\t\t\tShow current CPU ISO frequency policy",
-	"  --showdfcstatectrl [SOCKET]\t\t\t\t\tShow current DF C-state status",
+	"--showxgmibw [SOCKET] [LINK<P0-P2,G0-G2>] [BW<AGG_BW,RD_BW,WR_BW>]@Show"
+	" xGMI bandwidth for a given socket, linkname and bwtype",
+	"--showcurrpwrefficiencymode [SOCKET]@Show current power effciency mode",
+	"--showcpurailisofreqpolicy [SOCKET]@Show current CPU ISO frequency policy",
+	"--showdfcstatectrl [SOCKET]@Show current DF C-state status",
 };
 
 static char* const feat_ver5_F1A_M00_1F_set[] = {
-	"  --setpowerefficiencymode [SOCKET] [MODE<0-5>]\t\t\tSet power efficiency mode"
+	"--setpowerefficiencymode [SOCKET] [MODE<0-5>]@Set power efficiency mode"
 	" for a given socket",
-	"  --setxgmipstaterange [SOCKET] [MIN<0,1>] [MAX<0,1>]\t\tSet xgmi pstate range",
-	"  --setcpurailisofreqpolicy [SOCKET] [VAL<0,1>]\t\t\tSet CPU ISO frequency policy",
-	"  --setdfcctrl [SOCKET] [VAL<0,1>]\t\t\t\tEnable or disable DF c-state"
+	"--setxgmipstaterange [SOCKET] [MIN<0,1>] [MAX<0,1>]@Set xgmi pstate range",
+	"--setcpurailisofreqpolicy [SOCKET] [VAL<0,1>]@Set CPU ISO frequency policy",
+	"--setdfcctrl [SOCKET] [VAL<0,1>]@Enable or disable DF c-state"
 };
 
 static char* const feat_ver5_set[] = {
-	"  --setpcielinkratecontrol [SOCKET] [CTL<0-2>]\t\t\tSet rate control for pcie link"
+	"--setpcielinkratecontrol [SOCKET] [CTL<0-2>]@Set rate control for pcie link"
 	" for a given socket",
-	"  --setdfpstaterange [SOCKET] [MIN<0-2>] [MAX<0-2>]\t\tSet df pstate range"
+	"--setdfpstaterange [SOCKET] [MIN<0-2>] [MAX<0-2>]@Set df pstate range"
 	" for a given socket (MAX <= MIN)",
-	"  --setgmi3linkwidth [SOCKET] [MIN<0-2>] [MAX<0-2>]\t\tSet gmi3 link width"
+	"--setgmi3linkwidth [SOCKET] [MIN<0-2>] [MAX<0-2>]@Set gmi3 link width"
 	" for a given socket (MAX >= MIN)",
 };
 
 static char* const feat_ver5_F1A_M50_5F_set[] = {
-	"  --setdfpstaterange [SOCKET] [MIN<0-2>] [MAX<0-2>]\t\tSet df pstate range"
+	"--setdfpstaterange [SOCKET] [MIN<0-2>] [MAX<0-2>]@Set df pstate range"
 	" for a given socket (MAX <= MIN)",
 };
 
 static char* const feat_ver6_get[] = {
-	"  --showcclkfreqlimit [CORE]\t\t\t\t\tShow current clock frequency limit(MHz) for a given core",
-	"  --showsvipower \t\t\t\t\t\tShow svi based power telemetry of all rails for all sockets",
-	"  --showxgmibw [SOCKET] [LINK<G0-G7>] [BW<AGG_BW,RD_BW,WR_BW>]\t\tShow xGMI bandwidth for a given socket,"
+	"--showcclkfreqlimit [CORE]@Show current clock frequency limit(MHz) for a given core",
+	"--showsvipower@Show svi based power telemetry of all rails for all sockets",
+	"--showxgmibw [SOCKET] [LINK<G0-G7>] [BW<AGG_BW,RD_BW,WR_BW>]@Show xGMI bandwidth for a given socket,"
 	" linkname and bwtype",
-	"  --showiobw [SOCKET] [LINK<P2,P3,G0-G7>]\t\t\tShow IO aggregate bandwidth for a given socket and"
+	"--showiobw [SOCKET] [LINK<P2,P3,G0-G7>]@Show IO aggregate bandwidth for a given socket and"
 	" linkname",
-	"  --showlclkdpmlevel [SOCKET] [NBIOID<0-3>]\t\t\tShow lclk dpm level for a given nbio"
+	"--showlclkdpmlevel [SOCKET] [NBIOID<0-3>]@Show lclk dpm level for a given nbio"
 	" in a given socket",
-	"  --showsockclkfreqlimit [SOCKET]\t\t\t\tShow current clock frequency limit(MHz) for a given socket",
-	"  --showmetrictablever\t\t\t\t\t\tShow Metrics Table Version",
-	"  --showmetrictable [SOCKET]\t\t\t\t\tShow Metrics Table",
+	"--showsockclkfreqlimit [SOCKET]@Show current clock frequency limit(MHz) for a given socket",
+	"--showmetrictablever@Show Metrics Table Version",
+	"--showmetrictable [SOCKET]@Show Metrics Table",
 };
 
 static char* const feat_ver6_set[] = {
 	"Set Option<s>:",
-	"  --setpowerlimit [SOCKET] [POWER]\t\t\t\tSet power limit"
+	"--setpowerlimit [SOCKET] [POWER]@Set power limit"
 	" for a given socket (mWatts)",
-	"  --setcorebl [CORE] [BOOSTLIMIT]\t\t\t\tSet boost limit"
-	" for a given core (MHz)",
-	"  --setsockbl [SOCKET] [BOOSTLIMIT]\t\t\t\tSet Boost"
-	" limit for a given Socket (MHz)",
-	"  --setxgmiwidth [SOCKET] [MIN<0-2>] [MAX<0-2>]\t\t\tSet xgmi link width"
+	"--setcorebl [CORE] [BOOSTLIMIT]@Set boost limit for a given core (MHz)",
+	"--setsockbl [SOCKET] [BOOSTLIMIT]@Set Boost limit for a given Socket (MHz)",
+	"--setxgmiwidth [SOCKET] [MIN<0-2>] [MAX<0-2>]@Set xgmi link width"
 	" in a multi socket system (MAX >= MIN)",
-	"  --setlclkdpmlevel [SOCKET] [NBIOID<0-3>] [MIN<0-2>] [MAX<0-2>]Set lclk dpm level"
+	"--setlclkdpmlevel [SOCKET] [NBIOID<0-3>] [MIN<0-2>] [MAX<0-2>]@Set lclk dpm level"
 	" for a given nbio in a given socket (MAX >= MIN)",
 };
 
 static char* const feat_ver7_F1A_M50_5F_get[] = {
-	"  --getapbstatus [SOCKET]\t\t\t\t\tGet APB status and Data Fabric pstate(if APBDisabled)",
-	"  --getxgmiwidth [SOCKET]\t\t\t\t\tGet xgmi link width",
-	"  --getdfpstaterange [SOCKET]\t\t\t\t\tGet df pstate range"
-	" for a given socket",
-	"  --getxgmipstaterange [SOCKET]\t\t\t\t\tGet xgmi pstate range for a given socket",
-	"  --getccdpower [CORE]\t\t\t\t\t\tGet CCD power for a given core",
-	"  --gettdelta [SOCKET]\t\t\t\t\t\tGet thermal solution behaviour for a given socket",
-	"  --getspdregdata [SOCKET] [DIMM_ADDR] [LID] [OFFSET] [REGSPACE] Get SPD SB register data(REGSPACE:0->Volatile,1->NVM)",
-	"  --getsvi3vrtemp [SOCKET] [TYPE] [RAIL_INDEX(if TYPE=1)]\tGet svi3 vr controller temperature(TYPE:0->HottestRail,1->IndividualRail)",
+	"--getapbstatus [SOCKET]@Get APB status and Data Fabric pstate(if APBDisabled)",
+	"--getxgmiwidth [SOCKET]@Get xgmi link width",
+	"--getdfpstaterange [SOCKET]@Get df pstate range for a given socket",
+	"--getxgmipstaterange [SOCKET]@Get xgmi pstate range for a given socket",
+	"--getccdpower [CORE]@Get CCD power for a given core",
+	"--gettdelta [SOCKET]@Get thermal solution behaviour for a given socket",
+	"--getspdregdata [SOCKET] [DIMM_ADDR] [LID] [OFFSET] [REGSPACE]@Get SPD SB register data(REGSPACE:0->Volatile,1->NVM)",
+	"--getsvi3vrtemp [SOCKET] [TYPE] [RAIL_INDEX(if TYPE=1)]@Get svi3 vr controller temperature(TYPE:0->HottestRail,1->IndividualRail)",
 };
 
 static char* const feat_pc6_cc6_systemidle_get[] = {
-	"  --getpc6enable [SOCKET]\t\t\t\t\tGet the PC6 Enable Control",
-	"  --getcc6enable [SOCKET]\t\t\t\t\tGet the CC6 Enable Control",
+	"--getpc6enable [SOCKET]@Get the PC6 Enable Control",
+	"--getcc6enable [SOCKET]@Get the CC6 Enable Control",
 };
 
 static char* const feat_pc6_cc6_systemidle_set[] = {
-        "  --setpc6enable [SOCKET] [val<0,1>]\t\t\t\tSet the PC6 Enable Control",
-        "  --setcc6enable [SOCKET] [val<0,1>]\t\t\t\tSet the CC6 Enable Control",
+    "--setpc6enable [SOCKET] [val<0,1>]@Set the PC6 Enable Control",
+    "--setcc6enable [SOCKET] [val<0,1>]@Set the CC6 Enable Control",
 };
 
 static char* const blankline[] = {""};
 
 static char **features = NULL;
+
+#define PRINT_HELP_LINE(s) {\
+	if (s[0] == '-') { \
+		char *opt, *idx = strstr(s, "@"); \
+		opt = strdup(idx ? s : ""); \
+		if (idx != NULL) { \
+			opt[idx-s]='\0'; \
+			idx++; \
+		} \
+		printf("  %-70s%s\n", opt, idx); \
+		free(opt); \
+	} else { \
+		printf("%s\n", s); \
+	} \
+}
+
+#define PRINT_ARRAY(vname, offset, subset) { \
+	int max = ARRAY_SIZE(vname); \
+	if (subset) \
+		printf("  # %s\n", (char *) subset); \
+	for (i = offset; i < max; i++) { \
+		PRINT_HELP_LINE(vname[i]); \
+	} \
+}
 
 static void show_usage(char *exe_name)
 {
@@ -3449,13 +3471,35 @@ static void show_usage(char *exe_name)
 
 	printf("Usage: %s [Option]... <INPUT>...\n", exe_name);
 	printf("Help : %s --help\n\n", exe_name);
-	if(features != NULL)
-	{
+	if (features != NULL) {
 		while (features[i]) {
-			printf("%s\n", features[i]);
+			PRINT_HELP_LINE(features[i]); \
 			i++;
 		}
+		return;
 	}
+	PRINT_ARRAY(feat_comm, 0, NULL);
+	PRINT_ARRAY(feat_energy, 0, NULL);
+	PRINT_ARRAY(feat_ver3, 0, "v3");
+	PRINT_ARRAY(feat_ver4, 0, "v4");
+
+	PRINT_ARRAY(feat_ver2_get, 0, "v2");
+	PRINT_ARRAY(feat_ver5_get, 0, "v5");
+	PRINT_ARRAY(feat_ver5_F19_M00_0F_get, 0, "v5 Family 0x19 Modell 00..0F");
+	PRINT_ARRAY(feat_ver5_F1A_M00_1F_get, 0, "v5 Family 0x1A Modell 00..1F");
+	PRINT_ARRAY(feat_ver5_F1A_M50_5F_get, 0, "v5 Family 0x1A Modell 50..5F");
+	PRINT_ARRAY(feat_ver5_xgmibw_F1A_M50_5F_get, 0, NULL);
+	PRINT_ARRAY(feat_ver6_get, 0, "v6");
+	PRINT_ARRAY(feat_pc6_cc6_systemidle_get, 0, NULL);
+	PRINT_ARRAY(feat_ver7_F1A_M50_5F_get, 0, "v7 Family 0x1A Modell 50..5F");
+	printf("\n");
+	PRINT_ARRAY(feat_ver2_set, 0, NULL);
+	PRINT_ARRAY(feat_ver5_F19_M00_0F_set, 0, "v5 Family 0x19 Modell 00..0F");
+	PRINT_ARRAY(feat_ver5_F1A_M00_1F_set, 0, "v5 Family 0x1A Modell 00..1F");
+	PRINT_ARRAY(feat_ver5_set, 0, "v5");
+	PRINT_ARRAY(feat_ver5_F1A_M50_5F_set, 0, "v5 Family 0x1A Modell 50..5F");
+	PRINT_ARRAY(feat_ver6_set, 1, "v6");
+	PRINT_ARRAY(feat_pc6_cc6_systemidle_set, 0, "v7 Family 0x19 Modell 00..0F");
 }
 
 /*
@@ -3998,6 +4042,7 @@ static int parsesmi_args(int argc,char **argv)
 	optind = 0;
 	char* err_string = NULL;
 	int ret_on_err = ESMI_INVALID_INPUT;
+	bool need_help = false;
 	bool show_usage_on_err = false;
 	while ((opt = getopt_long(argc, argv, helperstring,
 			long_options, &long_index)) != -1)
@@ -4009,6 +4054,9 @@ static int parsesmi_args(int argc,char **argv)
 			sprintf(temp_string, "%s: option '-%c' requires an argument.\n\n", argv[0], opt);
 			append_string(&err_string, temp_string);
 			break;
+		}
+		else if (opt == 'h') {
+			need_help = true;
 		}
 		else if (opt == '?')
 		{
@@ -4422,8 +4470,14 @@ static int parsesmi_args(int argc,char **argv)
 	/* smi monitor objects initialization */
 	ret = esmi_init();
 	if(ret != ESMI_SUCCESS) {
-		printf(RED "\tESMI Not initialized, drivers not found.\n"
-		       "\tErr[%d]: %s\n" RESET, ret, esmi_get_err_msg(ret));
+		printf(RED "  ESMI Not initialized, drivers not found.\n"
+			"  Err[%d]: %s\n" RESET, ret, esmi_get_err_msg(ret));
+		if (need_help) {
+			printf(RED "\n"
+			"  The following help message contains options which might be\n"
+			"  not available on your system.\n\n" RESET);
+			show_usage(argv[0]);
+		}
 		return ret;
 	}
 
